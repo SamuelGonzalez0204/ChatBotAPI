@@ -6,5 +6,4 @@ whisper
 gtts
 flask
 flask_cors
-openai-whisper
 gunicorn
