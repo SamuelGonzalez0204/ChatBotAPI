@@ -1,0 +1,7 @@
+os
+torch
+transformers
+dotenv
+whisper
+gtts
+flask
