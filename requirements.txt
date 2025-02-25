@@ -1,7 +1,7 @@
 torch
 transformers
 dotenv
-whisper
+openai-whisper
 gtts
 flask
 flask_cors
