@@ -1,0 +1,5 @@
+google-generativeai
+flask
+flask_session
+markdown
+jsonfy
