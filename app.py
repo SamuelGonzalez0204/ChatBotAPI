@@ -17,7 +17,7 @@ Características:
 import os
 
 import google.generativeai as genai
-import jsonfy
+import json
 import markdown
 import requests
 from flask import Flask, request, render_template, session
