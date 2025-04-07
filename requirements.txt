@@ -6,5 +6,4 @@ gtts
 flask
 flask_cors
 gunicorn
-huggingface_hub
 
