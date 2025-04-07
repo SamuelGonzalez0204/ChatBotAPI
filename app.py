@@ -20,7 +20,7 @@ import google.generativeai as genai
 import json
 import markdown
 import requests
-from flask import Flask, request, render_template, session
+from flask import Flask, request, render_template, session, jsonify
 from flask_session import Session
 from flask_cors import CORS
 
