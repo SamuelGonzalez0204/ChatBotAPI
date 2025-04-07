@@ -26,7 +26,7 @@ from flask_cors import CORS
 
 # Configuración de la aplicación Flask
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "https://consultas.miopiamagna.org/"}})
+CORS(app)
 
 # Configuración de sesiones
 app.secret_key = "clave_secreta_para_sesiones"  # Cambia esto en producción
