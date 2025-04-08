@@ -4,4 +4,4 @@ flask_session
 markdown
 gunicorn 
 Flask-CORS
-whisper
+openai-whisper>=2023030
