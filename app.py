@@ -1,37 +1,23 @@
-"""
-Aplicación web basada en Flask que utiliza el modelo 'gemini-1.5-flash' de Google Gemini para generar respuestas
-a partir de entradas del usuario. La aplicación almacena el historial de conversaciones y utiliza Markdown
-para formatear las respuestas generadas.
-
-Requisitos:
-- Flask y Flask-Session instalados.
-- Paquete `google.generativeai` instalado.
-- Configurar la variable de entorno `GEMINI_API_KEY` con la clave de acceso a la API de Gemini.
-
-Características:
-1. Muestra una página inicial donde el usuario puede interactuar con el modelo.
-2. Permite gestionar un historial limitado de interacciones entre usuario y modelo.
-3. Formatea las respuestas en Markdown antes de mostrarlas.
-"""
-
 import os
-
 import google.generativeai as genai
 import json
 import markdown
 import requests
-from flask import Flask, request, render_template, session, jsonify
+from flask import Flask, request, session, jsonify
 from flask_session import Session
 from flask_cors import CORS
+import whisper
 
 # Configuración de la aplicación Flask
 app = Flask(__name__)
-CORS(app)
-
-# Configuración de sesiones
-app.secret_key = "clave_secreta_para_sesiones"  # Cambia esto en producción
+CORS(app, resources={r"/api/*": {"origins": "https://consultas.miopiamagna.org/"}})
+app.secret_key = "clave_secreta_para_sesiones"
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
+
+# Cargar modelo Whisper (asegúrate de que el tamaño sea apropiado para tus recursos)
+whisper_model = whisper.load_model("base")
+
 # Configuración del modelo Gemini
 genai.configure(api_key=os.getenv("GEMINI_ACCESS_TOKEN"))
 model = genai.GenerativeModel("gemini-1.5-flash")
@@ -39,11 +25,33 @@ model = genai.GenerativeModel("gemini-1.5-flash")
 # Constante para limitar el historial de interacciones
 MAX_HISTORY = 4
 
+# Función para transcribir audio con Whisper
+def transcribir_audio(archivo_audio):
+    resultado = whisper_model.transcribe(archivo_audio)
+    return resultado["text"]
+
+@app.route("/api/transcribe", methods=["POST"])
+def api_transcribe():
+    """
+    Endpoint para recibir un archivo de audio y transcribirlo a texto usando Whisper.
+    """
+    if 'audio' not in request.files:
+        return jsonify({"error": "No se proporcionó ningún archivo de audio"}), 400
+
+    audio_file = request.files['audio']
+    try:
+        # Guardar temporalmente el archivo de audio
+        audio_file.save("temp_audio.mp3")
+        transcribed_text = transcribir_audio("temp_audio.mp3")
+        os.remove("temp_audio.mp3")  # Eliminar el archivo temporal
+        return jsonify({"text": transcribed_text})
+    except Exception as e:
+        return jsonify({"error": f"Error al transcribir el audio: {str(e)}"}), 500
 
 @app.route("/api/predict", methods=["POST"])
 def api_predict():
     """
-    Endpoint de la API para recibir la pregunta del usuario y devolver la respuesta de Gemini en JSON.
+    Endpoint para recibir el texto del usuario y obtener la respuesta de Gemini.
     """
     prompt = request.form.get("prompt")
     if not prompt:
