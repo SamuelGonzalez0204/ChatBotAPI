@@ -4,3 +4,4 @@ flask_session
 markdown
 gunicorn 
 Flask-CORS
+whisper
