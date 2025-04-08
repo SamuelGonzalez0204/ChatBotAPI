@@ -16,7 +16,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Cargar modelo Whisper (asegúrate de que el tamaño sea apropiado para tus recursos)
-whisper_model = whisper.load_model("base")
+whisper_model = whisper.load("base")
 
 # Configuración del modelo Gemini
 genai.configure(api_key=os.getenv("GEMINI_ACCESS_TOKEN"))
